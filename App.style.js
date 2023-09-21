@@ -6,6 +6,9 @@ export const s = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
+  cardItem: {
+    marginBottom: 20,
+  },
   header: {
     flex: 1,
   },

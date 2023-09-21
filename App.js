@@ -1,21 +1,59 @@
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
 import { Header } from "././components/Header/Header";
 import { CardTodo } from "./components/CardTodo/CardTodo";
+import { useState } from "react";
 
-const TODO_LIST = [
-  { id: 1, title: "Sortir le chien", isCompleted: true },
-  { id: 2, title: "Aller chez le garagiste", isCompleted: false },
-  { id: 3, title: "Faire les courses", isCompleted: true },
-  { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
-  { id: 5, title: "Sortir le chien", isCompleted: true },
-  { id: 6, title: "Aller chez le garagiste", isCompleted: false },
-  { id: 7, title: "Faire les courses", isCompleted: true },
-  { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
-];
+// const TODO_LIST = [
+//   { id: 1, title: "Sortir le chien", isCompleted: true },
+//   { id: 2, title: "Aller chez le garagiste", isCompleted: false },
+//   { id: 3, title: "Faire les courses", isCompleted: true },
+//   { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
+// { id: 5, title: "Sortir le chien", isCompleted: true },
+// { id: 6, title: "Aller chez le garagiste", isCompleted: false },
+// { id: 7, title: "Faire les courses", isCompleted: true },
+// { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
+// ];
 
 export default function App() {
+  const [todoList, setTodoList] = useState([
+    { id: 1, title: "Sortir le chien", isCompleted: true },
+    { id: 2, title: "Aller chez le garagiste", isCompleted: false },
+    { id: 3, title: "Faire les courses", isCompleted: true },
+    { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
+    { id: 5, title: "Sortir le chien", isCompleted: true },
+    { id: 6, title: "Aller chez le garagiste", isCompleted: false },
+    { id: 7, title: "Faire les courses", isCompleted: true },
+    { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
+  ]);
+
+  function updateTodo(todo) {
+    const updatedTodo = {
+      ...todo,
+      isCompleted: !todo.isCompleted,
+    };
+
+    const indexToUpdate = todoList.findIndex(
+      (todo) => todo.id === updatedTodo.id
+    );
+
+    //copie du tableau vu que c est un state on peut pas le modifier directement
+    const updatedTodoList = [...todoList];
+
+    updatedTodoList[indexToUpdate] = updatedTodo;
+    setTodoList(updatedTodoList);
+    // console.log(indexToUpdate);
+  }
+
+  function renderTodoList() {
+    return todoList.map((todo) => (
+      <View style={s.cardItem} key={todo.id}>
+        <CardTodo onPress={updateTodo} todo={todo} />
+      </View>
+    ));
+  }
+
   return (
     <>
       <SafeAreaProvider>
@@ -24,7 +62,7 @@ export default function App() {
             <Header />
           </View>
           <View style={s.body}>
-            <CardTodo todo={TODO_LIST[0]} />
+            <ScrollView>{renderTodoList()}</ScrollView>
           </View>
         </SafeAreaView>
       </SafeAreaProvider>
