@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { s } from "./App.style";
 import { Header } from "././components/Header/Header";
@@ -59,10 +59,27 @@ export default function App() {
     // console.log(indexToUpdate);
   }
 
+  function deleteToto(todoToDelete) {
+    Alert.alert("Suppression", "Supprimer cette tâche ?", [
+      {
+        text: "Supprimer",
+        style: "destructive",
+        onPress: () => {
+          setTodoList(todoList.filter((todo) => todo.id !== todoToDelete.id));
+          console.log(todoToDelete);
+        },
+      },
+      {
+        text: "Annuler",
+        style: "cancel",
+      },
+    ]);
+  }
+
   function renderTodoList() {
     return getFilteredList().map((todo) => (
       <View style={s.cardItem} key={todo.id}>
-        <CardTodo onPress={updateTodo} todo={todo} />
+        <CardTodo onLongPress={deleteToto} onPress={updateTodo} todo={todo} />
       </View>
     ));
   }
