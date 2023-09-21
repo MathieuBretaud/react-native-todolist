@@ -4,26 +4,68 @@ import uuid from "react-native-uuid";
 import { s } from "./App.style";
 import { Header } from "././components/Header/Header";
 import { CardTodo } from "./components/CardTodo/CardTodo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TabBottomMenu } from "./components/TabBottumMenu/TabBottomMenu";
 import Dialog from "react-native-dialog";
 import { ButtonAdd } from "./components/ButtonAdd/ButtonAdd";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+let isFirstRender = true;
+let isLoadUpdate = false;
 
 export default function App() {
   const [selectedTabName, setSelectedTabName] = useState("all");
   const [todoList, setTodoList] = useState([
-    { id: 1, title: "Sortir le chien", isCompleted: true },
-    { id: 2, title: "Aller chez le garagiste", isCompleted: false },
-    { id: 3, title: "Faire les courses", isCompleted: true },
-    { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
-    { id: 5, title: "Sortir le chien", isCompleted: true },
-    { id: 6, title: "Aller chez le garagiste", isCompleted: false },
-    { id: 7, title: "Faire les courses", isCompleted: true },
-    { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
+    // { id: 1, title: "Sortir le chien", isCompleted: true },
+    // { id: 2, title: "Aller chez le garagiste", isCompleted: false },
+    // { id: 3, title: "Faire les courses", isCompleted: true },
+    // { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
+    // { id: 5, title: "Sortir le chien", isCompleted: true },
+    // { id: 6, title: "Aller chez le garagiste", isCompleted: false },
+    // { id: 7, title: "Faire les courses", isCompleted: true },
+    // { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
   ]);
 
   const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
   const [inputValue, setInputvalue] = useState("");
+
+  useEffect(() => {
+    loadTodoList();
+  }, []);
+
+  useEffect(() => {
+    if (isLoadUpdate) {
+      isLoadUpdate = false;
+    } else {
+      if (!isFirstRender) {
+        saveTodoList();
+      } else {
+        isFirstRender = false;
+      }
+    }
+  }, [todoList]);
+
+  async function saveTodoList() {
+    try {
+      await AsyncStorage.setItem("@todoList", JSON.stringify(todoList));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function loadTodoList() {
+    try {
+      const stringifiedTodoList = await AsyncStorage.getItem("@todoList");
+
+      if (stringifiedTodoList !== null) {
+        const parsedTodoList = JSON.parse(stringifiedTodoList);
+        isLoadUpdate = true;
+        setTodoList(parsedTodoList);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   function getFilteredList() {
     switch (selectedTabName) {
