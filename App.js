@@ -1,21 +1,13 @@
 import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import uuid from "react-native-uuid";
 import { s } from "./App.style";
 import { Header } from "././components/Header/Header";
 import { CardTodo } from "./components/CardTodo/CardTodo";
 import { useState } from "react";
 import { TabBottomMenu } from "./components/TabBottumMenu/TabBottomMenu";
-
-// const TODO_LIST = [
-//   { id: 1, title: "Sortir le chien", isCompleted: true },
-//   { id: 2, title: "Aller chez le garagiste", isCompleted: false },
-//   { id: 3, title: "Faire les courses", isCompleted: true },
-//   { id: 4, title: "Appeler le vétérinaire", isCompleted: true },
-// { id: 5, title: "Sortir le chien", isCompleted: true },
-// { id: 6, title: "Aller chez le garagiste", isCompleted: false },
-// { id: 7, title: "Faire les courses", isCompleted: true },
-// { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
-// ];
+import Dialog from "react-native-dialog";
+import { ButtonAdd } from "./components/ButtonAdd/ButtonAdd";
 
 export default function App() {
   const [selectedTabName, setSelectedTabName] = useState("all");
@@ -29,6 +21,9 @@ export default function App() {
     { id: 7, title: "Faire les courses", isCompleted: true },
     { id: 8, title: "Appeler le vétérinaire", isCompleted: true },
   ]);
+
+  const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
+  const [inputValue, setInputvalue] = useState("");
 
   function getFilteredList() {
     switch (selectedTabName) {
@@ -84,6 +79,21 @@ export default function App() {
     ));
   }
 
+  function showAddDialog() {
+    setIsAddDialogVisible(true);
+  }
+
+  function addTodo() {
+    const newTodo = {
+      id: uuid.v4(),
+      title: inputValue,
+      isCompleted: false,
+    };
+
+    setTodoList([...todoList, newTodo]);
+    setIsAddDialogVisible(false);
+  }
+
   return (
     <>
       <SafeAreaProvider>
@@ -94,15 +104,30 @@ export default function App() {
           <View style={s.body}>
             <ScrollView>{renderTodoList()}</ScrollView>
           </View>
+          <ButtonAdd onPress={showAddDialog} />
         </SafeAreaView>
       </SafeAreaProvider>
-      <View style={s.footer}>
-        <TabBottomMenu
-          todoList={todoList}
-          onPress={setSelectedTabName}
-          selectedTabName={selectedTabName}
+      <TabBottomMenu
+        todoList={todoList}
+        onPress={setSelectedTabName}
+        selectedTabName={selectedTabName}
+      />
+      <Dialog.Container
+        visible={isAddDialogVisible}
+        onBackdropPress={() => setIsAddDialogVisible(false)}
+      >
+        <Dialog.Title>Créer une tâche</Dialog.Title>
+        <Dialog.Description>
+          Choisi un nom pour la nouvelle tâche
+        </Dialog.Description>
+        <Dialog.Input onChangeText={setInputvalue} />
+
+        <Dialog.Button
+          disabled={inputValue.trim().length === 0}
+          label="Créer"
+          onPress={addTodo}
         />
-      </View>
+      </Dialog.Container>
     </>
   );
 }
